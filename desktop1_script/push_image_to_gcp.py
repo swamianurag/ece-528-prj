@@ -49,17 +49,23 @@ def downloadFromBucket(bucketName,filePath,blonNameInCloud):
         return False  
 
 # Setting credentials using the downloaded JSON file
-start_time = time.time()
-
-# Setting credentials using the downloaded JSON file
-
 client = storage.Client().from_service_account_json(json_credentials_path='../ece-528-project-d4286d2dd5b1.json')
-# Creating bucket object
-bucket = client.get_bucket('ece-528-image')
-# Name of the object to be stored in the bucket
-object_name_in_gcs_bucket = bucket.blob('wakeupcat_'+str(time.time())+".jpg")
-# Name of the object in local file system
-object_name_in_gcs_bucket.upload_from_filename('weapon.jpg')
+def push_image_cloud(image):
+    # get the bucket object
+    bucket = client.get_bucket('ece-528-image')
+    # Name of the object to be stored in the bucket
+    rpl = "_"+str(time.time())+".jpg"
+    x_image = image.replace(".jpg", rpl)
+    object_name_in_gcs_bucket = bucket.blob(x_image)
+    # Name of the object in local file system
+    object_name_in_gcs_bucket.upload_from_filename(image)
+    print("time of image push:",time.time())
 
-print("Time to execute This Script")
-print("--- %s seconds ---" % (time.time() - start_time))
+def main(argv):
+    if 0 == len(argv):
+        print("usage: 'python push_image_to_gcp.py <image_file>'")
+        return
+    push_image_cloud(argv[0])
+
+if __name__ == "__main__":
+   main(sys.argv[1:])
